@@ -1,0 +1,57 @@
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #333;
+}
+
+.arena {
+    position: relative;
+    width: 800px;
+    height: 400px;
+    background-color: #555;
+    border: 2px solid #000;
+    overflow: hidden;
+}
+
+.player {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    bottom: 0;
+    transition: left 0.1s, transform 0.1s; /* Adiciona transição para transformação */
+}
+
+/* Estilo do Player 1 */
+#player1 {
+    left: 100px;
+    background-color: blue;
+    border-left: 5px solid yellow; /* Lado que indica a direção */
+}
+
+/* Estilo do Player 2 */
+#player2 {
+    left: 600px;
+    background-color: green;
+    border-left: 5px solid yellow; /* Lado que indica a direção */
+}
+
+/* Quando o jogador vira para a esquerda */
+#player1.left, #player2.left {
+    transform: scaleX(-1); /* Inverte o jogador para a esquerda */
+}
+
+/* Quando o jogador vira para a direita */
+#player1.right, #player2.right {
+    transform: scaleX(1); /* Restaura a direção do jogador */
+}
+.attack {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: black;
+    border-radius: 50%; /* Forma circular */
+}

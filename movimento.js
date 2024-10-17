@@ -18,7 +18,7 @@ const player2 = {
 
 const gravity = -0.5;  // Inverte a força da gravidade
 const jumpStrength = 12;  // Aumenta a força do salto (agora positivo)
-const speed = 5;  // Velocidade de movimento
+const speed = 9;  // Velocidade de movimento
 const maxSpeed = 7;  // Velocidade máxima
 
 let keys = {

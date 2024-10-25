@@ -1,4 +1,5 @@
 const attackSpeed = 10; // Velocidade do ataque
+const attackDamage = 10; // Dano causado pelo ataque
 
 // Função para lançar um ataque
 function launchAttack(player, targetPlayer) {
@@ -36,7 +37,7 @@ function launchAttack(player, targetPlayer) {
         if (checkCollision(attackElement, targetPlayer.element)) {
             clearInterval(attackInterval);
             attackElement.remove(); // Remove o ataque ao colidir
-            handleCollision(targetPlayer); // Lidar com a colisão
+            applyDamage(targetPlayer, attackDamage); // Aplica dano ao jogador atingido
         }
     }, 20);
 }
@@ -54,12 +55,19 @@ function checkCollision(attack, target) {
     );
 }
 
-// Função para lidar com a colisão (pode ser adaptada para diferentes efeitos)
-function handleCollision(targetPlayer) {
-    console.log(`${targetPlayer.element.id} foi atingido!`);
-    // Exemplo: diminuir o tamanho do jogador como efeito de dano
-    targetPlayer.element.style.width = `${parseInt(targetPlayer.element.style.width) - 10}px`;
-    targetPlayer.element.style.height = `${parseInt(targetPlayer.element.style.height) - 10}px`;
+// Função para aplicar dano ao jogador atingido
+function applyDamage(targetPlayer, damage) {
+    console.log(`${targetPlayer.element.id} foi atingido! Dano: ${damage}`);
+    targetPlayer.health -= damage;
+
+    if (targetPlayer.health <= 0) {
+        console.log(`${targetPlayer.element.id} foi derrotado!`);
+        targetPlayer.element.style.display = 'none'; // Remove o jogador da arena
+    } else {
+        // Aqui você pode aplicar efeitos visuais, como mudar o tamanho do jogador após ser atingido
+        targetPlayer.element.style.width = `${parseInt(targetPlayer.element.style.width) - 10}px`;
+        targetPlayer.element.style.height = `${parseInt(targetPlayer.element.style.height) - 10}px`;
+    }
 }
 
 // Escuta a tecla de ataque para cada jogador

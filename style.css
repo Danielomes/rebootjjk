@@ -55,3 +55,18 @@ body {
     background-color: black;
     border-radius: 50%; /* Forma circular */
 }
+.health-bar-container {
+    position: absolute;
+    top: 10px;
+    width: 100px;
+    height: 10px;
+    background-color: gray;
+    border: 1px solid black;
+  }
+  
+  .health-bar {
+    height: 100%;
+    background-color: red;
+    transition: width 0.25s;
+  }
+  

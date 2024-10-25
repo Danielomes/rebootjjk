@@ -55,19 +55,39 @@ function checkCollision(attack, target) {
     );
 }
 
-// Função para aplicar dano ao jogador atingido
+// Função para aplicar dano ao jogador atingido e reiniciar o jogo ao derrotar o oponente
 function applyDamage(targetPlayer, damage) {
     console.log(`${targetPlayer.element.id} foi atingido! Dano: ${damage}`);
     targetPlayer.health -= damage;
 
     if (targetPlayer.health <= 0) {
-        console.log(`${targetPlayer.element.id} foi derrotado!`);
-        targetPlayer.element.style.display = 'none'; // Remove o jogador da arena
+        alert(`${targetPlayer.element.id} foi derrotado! Reiniciando o jogo.`);
+        
+        // Reinicia a partida
+        resetGame();
     } else {
-        // Aqui você pode aplicar efeitos visuais, como mudar o tamanho do jogador após ser atingido
+        // Aplica efeito visual ao jogador atingido
         targetPlayer.element.style.width = `${parseInt(targetPlayer.element.style.width) - 10}px`;
         targetPlayer.element.style.height = `${parseInt(targetPlayer.element.style.height) - 10}px`;
     }
+}
+
+// Função para reiniciar o jogo
+function resetGame() {
+    // Resetar a vida dos jogadores
+    player1.health = 100;
+    player2.health = 100;
+
+    // Resetar a posição e tamanho dos elementos dos jogadores
+    player1.element.style.display = 'block';
+    player1.element.style.width = "50px";
+    player1.element.style.height = "50px";
+
+    player2.element.style.display = 'block';
+    player2.element.style.width = "50px";
+    player2.element.style.height = "50px";
+
+    // Adicione outras redefinições, como posições dos jogadores na arena, se necessário
 }
 
 // Escuta a tecla de ataque para cada jogador

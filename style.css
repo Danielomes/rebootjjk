@@ -69,4 +69,8 @@ body {
     background-color: red;
     transition: width 0.25s;
   }
-  
+  .attack-box {
+  background-color: rgba(255, 0, 0, 0.5); /* Vermelho semitransparente */
+  border: 1px solid red;
+  z-index: 10; /* Garantir que esteja visível acima dos jogadores */
+}

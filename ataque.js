@@ -85,14 +85,17 @@ function applyDamage(defender, defenderHealthKey) {
   if (defenderHealthKey === "player1") {
     player1Health = Math.max(0, player1Health - 10); // Dano de 10
     player1HealthElement.textContent = `Vida: ${player1Health}`;
+    if (player1Health <= 0) {
+      alert("Jogador 1 perdeu! Reiniciando o jogo...");
+      location.reload(); // Reinicia a página
+    }
   } else if (defenderHealthKey === "player2") {
     player2Health = Math.max(0, player2Health - 10); // Dano de 10
     player2HealthElement.textContent = `Vida: ${player2Health}`;
-  }
-
-  // Reinicia o jogo se a vida de algum jogador chegar a 0
-  if (player1Health <= 0 || player2Health <= 0) {
-    resetGame();
+    if (player2Health <= 0) {
+      alert("Jogador 2 perdeu! Reiniciando o jogo...");
+      location.reload(); // Reinicia a página
+    }
   }
 }
 

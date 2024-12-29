@@ -10,7 +10,7 @@ document.addEventListener("keydown", (e) => {
         // Reinicia o cooldown após o tempo definido
         setTimeout(() => {
             abilityCooldown = false;
-        }, cooldownTime * 1); // Multiplicando por 1000 para converter segundos em milissegundos
+        }, cooldownTime * 900); // Multiplicando por 1000 para converter segundos em milissegundos
     }
 });
 

@@ -3,8 +3,8 @@ const player1HealthElement = document.getElementById("player1-health");
 const player2HealthElement = document.getElementById("player2-health");
 
 // Variáveis de estado dos jogadores
-let player1Health = 100;
-let player2Health = 100;
+let player1Health = 999;
+let player2Health = 999;
 
 let player1HitCount = 0; // Golpes recebidos pelo Player 1
 let player2HitCount = 0; // Golpes recebidos pelo Player 2

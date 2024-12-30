@@ -109,3 +109,171 @@ function resetPlayerMovement(player) {
     // Exemplo:
     // player.speed = player.defaultSpeed;  // Ajuste conforme a sua lógica de movimento
 }
+
+
+
+
+
+
+// BLACK FLASH
+
+
+
+// Nova habilidade "Black Flash"
+let blackFlashChargeStart = null; // Controla o início do carregamento
+let consecutiveBlackFlashHits = 0; // Contador de acertos consecutivos
+
+const blackFlashCooldown = 1000; // Cooldown entre ataques em ms
+let blackFlashLastUsed = 0; // Marca o último uso
+
+// Detecta o início do carregamento ao pressionar "r"
+document.addEventListener("keydown", (e) => {
+    if (e.key === "r" && !blackFlashChargeStart) {
+        blackFlashChargeStart = Date.now();
+    }
+});
+
+// Detecta o fim do carregamento ao soltar "r"
+document.addEventListener("keyup", (e) => {
+    if (e.key === "r" && blackFlashChargeStart) {
+        const chargeTime = (Date.now() - blackFlashChargeStart) / 1000; // Tempo em segundos
+        blackFlashChargeStart = null;
+
+        if (Date.now() - blackFlashLastUsed < blackFlashCooldown) {
+            return; // Respeita o cooldown
+        }
+
+        if (chargeTime >= 0.1 && chargeTime <= 0.9) {
+            performBlackFlash(player2, player1, "player1", true);
+        } else {
+            performDivergentFist(player2, player1, "player1");
+        }
+
+        blackFlashLastUsed = Date.now();
+    }
+});
+
+// Função para realizar o Black Flash
+function performBlackFlash(attacker, defender, defenderHealthKey, isBlackFlash) {
+    const attackBox = createAttackBox(attacker);
+
+    const defenderElement = defender.element;
+    const defenderLeft = parseInt(window.getComputedStyle(defenderElement).left);
+    const defenderRight = defenderLeft + defenderElement.clientWidth;
+
+    const attackBoxLeft = parseInt(attackBox.style.left);
+    const attackBoxRight = attackBoxLeft + parseInt(attackBox.style.width);
+
+    if (
+        attackBoxRight > defenderLeft &&
+        attackBoxLeft < defenderRight &&
+        parseInt(attackBox.style.bottom) < parseInt(window.getComputedStyle(defenderElement).bottom) + defenderElement.clientHeight
+    ) {
+        const baseDamage = 30;
+        const damage = baseDamage + (consecutiveBlackFlashHits >= 3 ? (20 * (consecutiveBlackFlashHits - 2)) : 0);
+        applyDamage(defender, defenderHealthKey, damage);
+
+        consecutiveBlackFlashHits++;
+        createBlackFlashEffect(defender);
+    } else {
+        consecutiveBlackFlashHits = 0; // Reseta se errar
+    }
+}
+
+// Função para realizar o soco divergente
+function performDivergentFist(attacker, defender, defenderHealthKey) {
+    const attackBox = createAttackBox(attacker);
+
+    const defenderElement = defender.element;
+    const defenderLeft = parseInt(window.getComputedStyle(defenderElement).left);
+    const defenderRight = defenderLeft + defenderElement.clientWidth;
+
+    const attackBoxLeft = parseInt(attackBox.style.left);
+    const attackBoxRight = attackBoxLeft + parseInt(attackBox.style.width);
+
+    if (
+        attackBoxRight > defenderLeft &&
+        attackBoxLeft < defenderRight &&
+        parseInt(attackBox.style.bottom) < parseInt(window.getComputedStyle(defenderElement).bottom) + defenderElement.clientHeight
+    ) {
+        applyDamage(defender, defenderHealthKey, 20);
+        createDivergentFistEffect(defender);
+    }
+}
+
+// Aplica dano ao defensor
+function applyDamage(defender, defenderHealthKey, damage) {
+    if (defenderHealthKey === "player1") {
+        player1Health = Math.max(0, player1Health - damage);
+        player1HealthElement.textContent = `Vida: ${player1Health}`;
+        if (player1Health <= 0) {
+            alert("Jogador 1 perdeu! Reiniciando o jogo...");
+            location.reload();
+        }
+    } else if (defenderHealthKey === "player2") {
+        player2Health = Math.max(0, player2Health - damage);
+        player2HealthElement.textContent = `Vida: ${player2Health}`;
+        if (player2Health <= 0) {
+            alert("Jogador 2 perdeu! Reiniciando o jogo...");
+            location.reload();
+        }
+    }
+}
+
+// Cria o efeito visual do Black Flash
+function createBlackFlashEffect(defender) {
+    const defenderElement = defender.element;
+
+    const flash = document.createElement("div");
+    flash.classList.add("black-flash-effect");
+    flash.style.position = "absolute";
+    flash.style.left = `${parseInt(window.getComputedStyle(defenderElement).left)}px`;
+    flash.style.bottom = `${parseInt(window.getComputedStyle(defenderElement).bottom)}px`;
+    flash.style.width = "100px";
+    flash.style.height = "100px";
+    flash.style.backgroundColor = "black";
+    flash.style.borderRadius = "50%";
+    flash.style.opacity = 0.7;
+    document.querySelector(".arena").appendChild(flash);
+
+    setTimeout(() => {
+        flash.remove();
+    }, 300); // Remove o efeito após 300ms
+
+    playBlackFlashSound();
+}
+
+// Cria o efeito visual do soco divergente
+function createDivergentFistEffect(defender) {
+    const defenderElement = defender.element;
+
+    const flash = document.createElement("div");
+    flash.classList.add("divergent-fist-effect");
+    flash.style.position = "absolute";
+    flash.style.left = `${parseInt(window.getComputedStyle(defenderElement).left)}px`;
+    flash.style.bottom = `${parseInt(window.getComputedStyle(defenderElement).bottom)}px`;
+    flash.style.width = "100px";
+    flash.style.height = "100px";
+    flash.style.backgroundColor = "blue";
+    flash.style.borderRadius = "50%";
+    flash.style.opacity = 0.7;
+    document.querySelector(".arena").appendChild(flash);
+
+    setTimeout(() => {
+        flash.remove();
+    }, 300); // Remove o efeito após 300ms
+
+    playDivergentFistSound();
+}
+
+// Função para tocar o som do Black Flash
+function playBlackFlashSound() {
+    const audio = new Audio("sons/blackflash.mp3"); // Substitua pelo caminho do som
+    audio.play();
+}
+
+// Função para tocar o som do soco divergente
+function playDivergentFistSound() {
+    const audio = new Audio("sons/divergente.mp3"); // Substitua pelo caminho do som
+    audio.play();
+}

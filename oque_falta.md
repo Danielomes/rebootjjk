@@ -6,7 +6,7 @@ habilidade:
 1-palma boogie woogie --feito--
 2-black flash/punho divergente --feito--
 3-sangue perfurante --feito--
-4-
+4- boogie woogie posicionada
 
 transformação: 120%
 

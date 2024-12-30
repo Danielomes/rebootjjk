@@ -277,3 +277,124 @@ function playDivergentFistSound() {
     const audio = new Audio("sons/divergente.mp3"); // Substitua pelo caminho do som
     audio.play();
 }
+
+
+
+
+
+// sangue perfurante
+
+
+
+
+
+// Nova habilidade "Sangue Perfurante"
+let piercingBloodCooldown = false; // Controla o cooldown do Sangue Perfurante
+const piercingBloodCooldownTime = 5000; // Cooldown de 5 segundos
+
+// Detecta tecla "t" para a habilidade Sangue Perfurante
+document.addEventListener("keydown", (e) => {
+    if (e.key === "t" && !piercingBloodCooldown) {
+        performPiercingBlood(player2, player1, "player1");
+        piercingBloodCooldown = true;
+
+        // Reinicia o cooldown após o tempo definido
+        setTimeout(() => {
+            piercingBloodCooldown = false;
+        }, piercingBloodCooldownTime);
+    }
+});
+
+// Função para realizar o Sangue Perfurante
+function performPiercingBlood(attacker, defender, defenderHealthKey) {
+    const projectile = createPiercingBloodProjectile(attacker);
+    const direction = attacker.facingRight ? 1 : -1; // Define a direção no momento do lançamento
+
+    const interval = setInterval(() => {
+        const projectileLeft = parseInt(projectile.style.left);
+        const projectileRight = projectileLeft + parseInt(projectile.style.width);
+        const projectileBottom = parseInt(projectile.style.bottom);
+
+        const defenderElement = defender.element;
+        const defenderLeft = parseInt(window.getComputedStyle(defenderElement).left);
+        const defenderRight = defenderLeft + defenderElement.clientWidth;
+        const defenderBottom = parseInt(window.getComputedStyle(defenderElement).bottom);
+        const defenderTop = defenderBottom + defenderElement.clientHeight;
+
+        // Verifica colisão
+        if (
+            projectileRight > defenderLeft &&
+            projectileLeft < defenderRight &&
+            projectileBottom > defenderBottom &&
+            projectileBottom < defenderTop
+        ) {
+            applyDamage(defender, defenderHealthKey, 40);
+            createPiercingBloodEffect(defender);
+            projectile.remove();
+            clearInterval(interval);
+        }
+
+        // Remove o projétil se sair da arena sem causar dano
+        if (projectileLeft > window.innerWidth || projectileLeft < 0) {
+            projectile.remove();
+            clearInterval(interval);
+        }
+
+        // Move o projétil na direção correta
+        const speed = 10; // Velocidade do projétil
+        projectile.style.left = `${projectileLeft + speed * direction}px`;
+    }, 20); // Atualiza a posição a cada 20ms
+}
+
+// Cria o projétil para o Sangue Perfurante
+function createPiercingBloodProjectile(attacker) {
+    const projectile = document.createElement("div");
+    projectile.classList.add("piercing-blood-projectile");
+
+    const attackerElement = attacker.element;
+    const attackerLeft = parseInt(window.getComputedStyle(attackerElement).left);
+    const attackerBottom = parseInt(window.getComputedStyle(attackerElement).bottom);
+
+    projectile.style.width = "100px"; // Dimensões do projétil
+    projectile.style.height = "20px";
+    projectile.style.position = "absolute";
+    projectile.style.bottom = `${attackerBottom + 30}px`;
+    projectile.style.left = attacker.facingRight
+        ? `${attackerLeft + attackerElement.clientWidth}px`
+        : `${attackerLeft - 100}px`;
+    projectile.style.backgroundColor = "red";
+    projectile.style.opacity = 0.9;
+
+    document.querySelector(".arena").appendChild(projectile);
+
+    return projectile;
+}
+
+// Cria o efeito visual do Sangue Perfurante
+function createPiercingBloodEffect(defender) {
+    const defenderElement = defender.element;
+
+    const effect = document.createElement("div");
+    effect.classList.add("piercing-blood-effect");
+    effect.style.position = "absolute";
+    effect.style.left = `${parseInt(window.getComputedStyle(defenderElement).left)}px`;
+    effect.style.bottom = `${parseInt(window.getComputedStyle(defenderElement).bottom)}px`;
+    effect.style.width = "100px";
+    effect.style.height = "100px";
+    effect.style.backgroundColor = "darkred";
+    effect.style.borderRadius = "50%";
+    effect.style.opacity = 0.6;
+    document.querySelector(".arena").appendChild(effect);
+
+    setTimeout(() => {
+        effect.remove();
+    }, 300); // Remove o efeito após 300ms
+
+    playPiercingBloodSound();
+}
+
+// Função para tocar o som do Sangue Perfurante
+function playPiercingBloodSound() {
+    const audio = new Audio("sons/piercing_blood.mp3"); // Substitua pelo caminho do som
+    audio.play();
+}

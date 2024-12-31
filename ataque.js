@@ -3,8 +3,8 @@ const player1HealthElement = document.getElementById("player1-health");
 const player2HealthElement = document.getElementById("player2-health");
 
 // Variáveis de estado dos jogadores
-let player1Health = 100;
-let player2Health = 100;
+let player1Health = 900;
+let player2Health = 900;
 
 let player1HitCount = 0; // Golpes recebidos pelo Player 1
 let player2HitCount = 0; // Golpes recebidos pelo Player 2
@@ -82,20 +82,27 @@ function performAttack(attacker, defender, defenderHealthKey) {
 
 // Aplica dano ao defensor
 function applyDamage(defender, defenderHealthKey) {
+  const damage = 10; // Quantidade de dano por ataque
+
   if (defenderHealthKey === "player1") {
-    player1Health = Math.max(0, player1Health - 10); // Dano de 10
+    player1Health = Math.max(0, player1Health - damage); // Reduz a vida do Player 1
     player1HealthElement.textContent = `Vida: ${player1Health}`;
-    if (player1Health <= 0) {
-      alert("Jogador 1 perdeu! Reiniciando o jogo...");
-      location.reload(); // Reinicia a página
-    }
+    checkGameOver("Jogador 1"); // Verifica se o Player 1 perdeu
   } else if (defenderHealthKey === "player2") {
-    player2Health = Math.max(0, player2Health - 10); // Dano de 10
+    player2Health = Math.max(0, player2Health - damage); // Reduz a vida do Player 2
     player2HealthElement.textContent = `Vida: ${player2Health}`;
-    if (player2Health <= 0) {
-      alert("Jogador 2 perdeu! Reiniciando o jogo...");
-      location.reload(); // Reinicia a página
-    }
+    checkGameOver("Jogador 2"); // Verifica se o Player 2 perdeu
+  }
+}
+
+// Verifica se o jogo acabou
+function checkGameOver(player) {
+  if (player1Health <= 0) {
+    alert(`${player} perdeu! Reiniciando o jogo...`);
+    resetGame(); // Reinicia o jogo sem recarregar a página
+  } else if (player2Health <= 0) {
+    alert(`${player} perdeu! Reiniciando o jogo...`);
+    resetGame(); // Reinicia o jogo sem recarregar a página
   }
 }
 
@@ -141,25 +148,18 @@ function applyPushback(defender, attacker, pushDistance) {
 
 // Reinicia o jogo
 function resetGame() {
-  player1Health = 100;
-  player2Health = 100;
+  player1Health = 900;
+  player2Health = 900;
 
-  player1HealthElement.textContent = "Vida: 100";
-  player2HealthElement.textContent = "Vida: 100";
+  player1HealthElement.textContent = "Vida: 900";
+  player2HealthElement.textContent = "Vida: 900";
 
   player1.element.style.left = "50px";
   player1.element.style.bottom = "0px";
   player2.element.style.left = "500px";
   player2.element.style.bottom = "0px";
 
-  player1.velocityX = 0;
-  player1.velocityY = 0;
-  player1.onGround = true;
   player1HitCount = 0;
-
-  player2.velocityX = 0;
-  player2.velocityY = 0;
-  player2.onGround = true;
   player2HitCount = 0;
 
   player1Paralyzed = false;

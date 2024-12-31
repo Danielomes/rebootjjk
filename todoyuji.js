@@ -407,68 +407,44 @@ function playPiercingBloodSound() {
 
 
 
-// Nova habilidade "Dash Teleport"
+
+
+// Nova habilidade "Dash Teleport" (Versão Atualizada)
 let dashTeleportCooldown = false; // Controla o cooldown do Dash Teleport
 const dashTeleportCooldownTime = 5000; // Cooldown de 5 segundos
+let dashTeleportStage = 0; // Controla os estágios do Dash Teleport
+let dashTeleportProjectile = null; // Referência ao projétil
 
 // Detecta tecla "y" para a habilidade Dash Teleport
 document.addEventListener("keydown", (e) => {
     if (e.key === "y" && !dashTeleportCooldown) {
-        performDashTeleport(player2, player1, "player1");
-        dashTeleportCooldown = true;
+        dashTeleportStage++;
 
-        // Reinicia o cooldown após o tempo definido
-        setTimeout(() => {
-            dashTeleportCooldown = false;
-        }, dashTeleportCooldownTime);
+        if (dashTeleportStage === 1) {
+            // Primeiro estágio: Lança o projétil
+            dashTeleportProjectile = createDashTeleportProjectile(player2);
+        } else if (dashTeleportStage === 2) {
+            // Segundo estágio: Para o projétil no lugar
+            if (dashTeleportProjectile) {
+                stopDashTeleportProjectile(dashTeleportProjectile);
+            }
+        } else if (dashTeleportStage === 3) {
+            // Terceiro estágio: Teleporta o jogador
+            if (dashTeleportProjectile) {
+                teleportPlayerToProjectile(player2, dashTeleportProjectile);
+                dashTeleportProjectile.remove();
+                dashTeleportProjectile = null;
+            }
+            dashTeleportStage = 0; // Reinicia os estágios
+            dashTeleportCooldown = true;
+
+            // Reinicia o cooldown após o tempo definido
+            setTimeout(() => {
+                dashTeleportCooldown = false;
+            }, dashTeleportCooldownTime);
+        }
     }
 });
-
-// Função para realizar o Dash Teleport
-function performDashTeleport(attacker, defender, defenderHealthKey) {
-    const projectile = createDashTeleportProjectile(attacker);
-    const direction = attacker.facingRight ? 1 : -1; // Define a direção no momento do lançamento
-
-    const interval = setInterval(() => {
-        const projectileLeft = parseInt(projectile.style.left);
-        const projectileRight = projectileLeft + parseInt(projectile.style.width);
-        const projectileBottom = parseInt(projectile.style.bottom);
-
-        const defenderElement = defender.element;
-        const defenderLeft = parseInt(window.getComputedStyle(defenderElement).left);
-        const defenderRight = defenderLeft + defenderElement.clientWidth;
-        const defenderBottom = parseInt(window.getComputedStyle(defenderElement).bottom);
-        const defenderTop = defenderBottom + defenderElement.clientHeight;
-
-        // Verifica colisão com o jogador
-        if (
-            projectileRight > defenderLeft &&
-            projectileLeft < defenderRight &&
-            projectileBottom > defenderBottom &&
-            projectileBottom < defenderTop
-        ) {
-            applyDamage(defender, defenderHealthKey, 50); // Aplica dano ao jogador atingido
-            teleportPlayerToProjectile(attacker, projectile);
-            createDashTeleportEffect(defender);
-            projectile.remove();
-            clearInterval(interval);
-            return;
-        }
-
-        // Verifica colisão com as bordas da arena
-        if (projectileLeft > window.innerWidth || projectileLeft < 0 || projectileBottom < 0 || projectileBottom > window.innerHeight) {
-            teleportPlayerToProjectile(attacker, projectile);
-            createDashTeleportEffect(null); // Efeito para colisão com a parede
-            projectile.remove();
-            clearInterval(interval);
-            return;
-        }
-
-        // Move o projétil na direção correta
-        const speed = 15; // Velocidade do projétil
-        projectile.style.left = `${projectileLeft + speed * direction}px`;
-    }, 20); // Atualiza a posição a cada 20ms
-}
 
 // Cria o projétil para o Dash Teleport
 function createDashTeleportProjectile(attacker) {
@@ -491,7 +467,34 @@ function createDashTeleportProjectile(attacker) {
 
     document.querySelector(".arena").appendChild(projectile);
 
+    moveDashTeleportProjectile(projectile, attacker.facingRight ? 1 : -1);
+
     return projectile;
+}
+
+// Move o projétil na direção correta
+function moveDashTeleportProjectile(projectile, direction) {
+    const speed = 15; // Velocidade do projétil
+
+    projectile.interval = setInterval(() => {
+        const projectileLeft = parseInt(projectile.style.left);
+
+        // Verifica se o projétil saiu da arena
+        if (projectileLeft > window.innerWidth || projectileLeft < 0) {
+            clearInterval(projectile.interval);
+            projectile.remove();
+            dashTeleportStage = 0; // Reinicia os estágios
+            dashTeleportProjectile = null;
+        } else {
+            projectile.style.left = `${projectileLeft + speed * direction}px`;
+        }
+    }, 20); // Atualiza a posição a cada 20ms
+}
+
+// Para o projétil no local atual
+function stopDashTeleportProjectile(projectile) {
+    clearInterval(projectile.interval);
+    projectile.interval = null;
 }
 
 // Teletransporta o jogador para a posição do projétil
@@ -500,40 +503,16 @@ function teleportPlayerToProjectile(player, projectile) {
     const projectileBottom = parseInt(projectile.style.bottom);
 
     const playerElement = player.element;
-    playerElement.style.transform = "none"; // Remove qualquer transformação antes
+    playerElement.style.transition = "none"; // Remove transições para evitar interferências
     playerElement.style.left = `${projectileLeft}px`;
     playerElement.style.bottom = `${projectileBottom}px`;
 
     createTeleportEffect(playerElement);
-}
 
-// Cria o efeito visual do Dash Teleport
-function createDashTeleportEffect(defender) {
-    const effect = document.createElement("div");
-    effect.classList.add("dash-teleport-effect");
-
-    if (defender) {
-        const defenderElement = defender.element;
-        effect.style.left = `${parseInt(window.getComputedStyle(defenderElement).left)}px`;
-        effect.style.bottom = `${parseInt(window.getComputedStyle(defenderElement).bottom)}px`;
-    } else {
-        effect.style.left = `${parseInt(window.getComputedStyle(document.querySelector(".dash-teleport-projectile")).left)}px`;
-        effect.style.bottom = `${parseInt(window.getComputedStyle(document.querySelector(".dash-teleport-projectile")).bottom)}px`;
-    }
-
-    effect.style.position = "absolute";
-    effect.style.width = "100px";
-    effect.style.height = "100px";
-    effect.style.backgroundColor = "purple";
-    effect.style.borderRadius = "50%";
-    effect.style.opacity = 0.6;
-    document.querySelector(".arena").appendChild(effect);
-
+    // Restaura as transições após o teleporte
     setTimeout(() => {
-        effect.remove();
-    }, 300); // Remove o efeito após 300ms
-
-    playDashTeleportSound();
+        playerElement.style.transition = "";
+    }, 100);
 }
 
 // Cria o efeito visual de teletransporte
@@ -553,10 +532,12 @@ function createTeleportEffect(playerElement) {
     setTimeout(() => {
         effect.remove();
     }, 300); // Remove o efeito após 300ms
+
+    playDashTeleportSound();
 }
 
 // Função para tocar o som do Dash Teleport
 function playDashTeleportSound() {
-    const audio = new Audio("sons/dash_teleport.mp3"); // Substitua pelo caminho do som
+    const audio = new Audio("sons/clap.mp3"); // Substitua pelo caminho do som
     audio.play();
 }

@@ -119,6 +119,11 @@ function resetPlayerMovement(player) {
 
 
 
+
+
+
+
+
 // Nova habilidade "Black Flash"
 let blackFlashChargeStart = null; // Controla o início do carregamento
 let consecutiveBlackFlashHits = 0; // Contador de acertos consecutivos
@@ -540,4 +545,123 @@ function createTeleportEffect(playerElement) {
 function playDashTeleportSound() {
     const audio = new Audio("sons/clap.mp3"); // Substitua pelo caminho do som
     audio.play();
+}
+
+
+
+
+
+
+//     --------------  120% ------------------
+
+
+
+// Adiciona a barra de ultimate no HTML
+const ultimateBar = document.createElement("div");
+ultimateBar.classList.add("ultimate-bar");
+ultimateBar.style.position = "absolute";
+ultimateBar.style.bottom = "10px";
+ultimateBar.style.left = "50%";
+ultimateBar.style.transform = "translateX(-50%)";
+ultimateBar.style.width = "300px";
+ultimateBar.style.height = "20px";
+ultimateBar.style.backgroundColor = "#333";
+ultimateBar.style.border = "2px solid #fff";
+
+const ultimateProgress = document.createElement("div");
+ultimateProgress.classList.add("ultimate-progress");
+ultimateProgress.style.width = "0%";
+ultimateProgress.style.height = "100%";
+ultimateProgress.style.backgroundColor = "gold";
+
+ultimateBar.appendChild(ultimateProgress);
+document.body.appendChild(ultimateBar);
+
+// Variáveis de controle da barra
+let ultimateCharge = 0;
+const ultimateMaxCharge = 100;
+let ultimateCharging = true;
+
+// Incrementa a barra com o tempo
+setInterval(() => {
+    if (ultimateCharging && ultimateCharge < ultimateMaxCharge) {
+        ultimateCharge += 1; // Ajuste o valor para controlar a velocidade de carregamento
+        updateUltimateBar();
+    }
+}, 100); // Incremento a cada 100ms
+
+// Incrementa a barra com ataques
+function incrementUltimateCharge(amount) {
+    if (ultimateCharge < ultimateMaxCharge) {
+        ultimateCharge += amount;
+        updateUltimateBar();
+    }
+}
+
+// Atualiza a barra visualmente
+function updateUltimateBar() {
+    ultimateProgress.style.width = `${Math.min(ultimateCharge, ultimateMaxCharge)}%`;
+}
+
+// Detecta a tecla "G" para ativar a ultimate
+document.addEventListener("keydown", (e) => {
+    if (e.key === "g" && ultimateCharge >= ultimateMaxCharge) {
+        activateUltimate();
+    }
+});
+
+// Função para ativar a ultimate
+function activateUltimate() {
+    ultimateCharging = false; // Pausa o carregamento
+    ultimateCharge = 0; // Reseta a barra
+    updateUltimateBar();
+
+    // Exibe a transformação
+    showUltimateAnimation();
+
+    // Restaura o carregamento após a transformação
+    setTimeout(() => {
+        ultimateCharging = true;
+    }, 60000); // Tempo de espera antes de recarregar a barra (60 segundos)
+}
+
+// Exibe a animação e o vídeo da transformação
+function showUltimateAnimation() {
+    const videoContainer = document.createElement("div");
+    videoContainer.style.position = "fixed";
+    videoContainer.style.top = "0";
+    videoContainer.style.left = "0";
+    videoContainer.style.width = "100vw";
+    videoContainer.style.height = "100vh";
+    videoContainer.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+    videoContainer.style.display = "flex";
+    videoContainer.style.justifyContent = "center";
+    videoContainer.style.alignItems = "center";
+    videoContainer.style.zIndex = "1000";
+
+    const video = document.createElement("video");
+    video.src = "video/120%.mp4"; // Substitua pelo caminho do vídeo
+    video.autoplay = true;
+    video.controls = false;
+    video.style.width = "80%";
+    video.style.height = "auto";
+
+    const audio = new Audio("audio/awk-yuji.mp3"); // Substitua pelo caminho da música
+    audio.loop = true;
+    audio.play();
+
+    videoContainer.appendChild(video);
+    document.body.appendChild(videoContainer);
+
+    video.addEventListener("ended", () => {
+        setTimeout(() => {
+            videoContainer.remove();
+        }, 9000); // Remove o vídeo após 1s
+    });
+
+    // Finaliza a música após 60 segundos
+    setTimeout(() => {
+        audio.pause();
+        audio.currentTime = 0;
+    }, 60000);
 }

@@ -12,5 +12,8 @@ transformação: 120%
 
 1-desmantelar
 2-plus ultra
-3-regeneração
+3-CTR
 4-expansao de dominio santoario benevolente
+
+
+
